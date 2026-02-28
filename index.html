@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego del Impostor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <h1>3ro's impostor</h1>
+        
+        <div id="login-screen">
+            <input type="text" id="player-name" placeholder="Tu nombre o apodo">
+            <button id="join-btn">Entrar al juego</button>
+        </div>
+
+        <div id="lobby-screen" class="hidden">
+            <h2>Jugadores conectados: <span id="player-count">0</span></h2>
+            <ul id="player-list"></ul>
+            <p id="waiting-msg" class="warning">Se necesitan al menos 3 jugadores para empezar.</p>
+            <button id="start-btn" class="hidden">¡Empezar Juego!</button>
+        </div>
+
+        <div id="game-screen" class="hidden">
+            <h2>Tu rol:</h2>
+            <div id="role-display" class="role-box">Cargando...</div>
+            <button id="reset-btn">Volver a jugar</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
