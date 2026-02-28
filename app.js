@@ -2,9 +2,16 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getDatabase, ref, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-// ⚠️ ACÁ VAN TUS CREDENCIALES DE FIREBASE
+// Tus credenciales de Firebase
 const firebaseConfig = {
-  // Tus datos irán acá
+  apiKey: "AIzaSyCftXlHZliRxT9cSFwZHfxHfJPfl3N8jbg",
+  authDomain: "impostor-3ro-2026.firebaseapp.com",
+  databaseURL: "https://impostor-3ro-2026-default-rtdb.firebaseio.com",
+  projectId: "impostor-3ro-2026",
+  storageBucket: "impostor-3ro-2026.firebasestorage.app",
+  messagingSenderId: "391509409814",
+  appId: "1:391509409814:web:9b32c74ef07afaa3a43537",
+  measurementId: "G-Z2ZY1Q76WZ"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -13,7 +20,6 @@ const db = getDatabase(app);
 // ==========================================
 // 🚨 ÚNICA LISTA DE VARIABLES DEL COLEGIO 🚨
 // ==========================================
-// Están todos mezclados: nadie sabe si tocará profe o alumno
 const personajesColegio = [
     "Antonia", "Antonella", "Dariana", "Delfina", "Juana", 
     "Julia", "Justina", "Luciana", "Keila", "Juani", 
@@ -52,7 +58,7 @@ joinBtn.addEventListener("click", () => {
 
     const myRef = ref(db, `sala_1/jugadores/${myPlayerId}`);
     set(myRef, { nombre: name });
-    onDisconnect(myRef).remove(); // Si cierra la pestaña, se resta 1 jugador automáticamente
+    onDisconnect(myRef).remove();
 
     loginScreen.classList.add("hidden");
     lobbyScreen.classList.remove("hidden");
@@ -62,7 +68,7 @@ joinBtn.addEventListener("click", () => {
 onValue(playersRef, (snapshot) => {
     const players = snapshot.val() || {};
     const ids = Object.keys(players);
-    const count = ids.length; // Esto es el total de conectados
+    const count = ids.length;
     
     playerCount.innerText = count;
     playerList.innerHTML = "";
@@ -82,7 +88,7 @@ onValue(playersRef, (snapshot) => {
     }
 });
 
-// Lógica estricta de asignación: 1 impostor y (Conectados - 1) normales
+// Lógica para empezar el juego
 startBtn.addEventListener("click", () => {
     onValue(playersRef, (snapshot) => {
         const players = snapshot.val() || {};
@@ -90,17 +96,14 @@ startBtn.addEventListener("click", () => {
         
         if (ids.length < 3) return;
 
-        // 1. Elegimos exactamente 1 ID para que sea el impostor
+        // 1 impostor y 1 palabra para el resto
         const randomImpostorId = ids[Math.floor(Math.random() * ids.length)];
-        
-        // 2. Elegimos exactamente 1 palabra de la lista unificada
         const randomWord = personajesColegio[Math.floor(Math.random() * personajesColegio.length)];
 
-        // 3. Subimos esto a la base de datos para que todos lo vean al mismo tiempo
         set(gameStateRef, {
             jugando: true,
-            impostorId: randomImpostorId, // Solo este ID será el impostor (1)
-            palabraSecreta: randomWord    // El resto (N-1) verá esta palabra
+            impostorId: randomImpostorId,
+            palabraSecreta: randomWord
         });
     }, { onlyOnce: true });
 });
@@ -113,12 +116,9 @@ onValue(gameStateRef, (snapshot) => {
         lobbyScreen.classList.add("hidden");
         gameScreen.classList.remove("hidden");
 
-        // Si mi ID coincide con el del impostor sorteado (1 persona)
         if (estado.impostorId === myPlayerId) {
             roleDisplay.innerHTML = `<span class="impostor-text">¡SOS EL IMPOSTOR! 🤫</span><br><br><small>Hacete el tonto y adiviná de quién están hablando.</small>`;
-        } 
-        // Si mi ID NO coincide, soy parte de los N-1 conectados y veo la variable
-        else {
+        } else {
             roleDisplay.innerHTML = `<span class="crewmate-text">La persona secreta es:</span><br><br><strong>${estado.palabraSecreta}</strong><br><br><small>Encontrá al impostor que no sabe quién es.</small>`;
         }
     } else {
